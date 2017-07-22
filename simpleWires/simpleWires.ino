@@ -58,6 +58,10 @@ void setup()
   led.begin();
   readWires(lastWires);
   solution = findSolution(lastWires, false);
+
+  // Disable the builtin LED
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop()
