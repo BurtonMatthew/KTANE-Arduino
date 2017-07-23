@@ -21,14 +21,12 @@
 #define YELLOW_READ 913 // 300k
 #define WHITE_READ 879  // 220k
 
-// Read values for pins using an external pullup resistor, which may have a different resistance than the internal pullup
-#define BLACK_READ_EXT 973  // 1M ohm
-#define BLUE_READ_EXT 952   // 680k
-#define RED_READ_EXT 923    // 470k
-#define YELLOW_READ_EXT 875 // 300k
-#define WHITE_READ_EXT 831  // 220k
-
-#define READ_VARIANCE 8
+// Read values for pins using an external pullup resistor, which may have a different resistance than the internal pullup (I used a 20k for these values)
+#define BLACK_READ_EXT 1004  // 1M ohm
+#define BLUE_READ_EXT 994   // 680k
+#define RED_READ_EXT 982    // 470k
+#define YELLOW_READ_EXT 961 // 300k
+#define WHITE_READ_EXT 939  // 220k
 
 enum class WireColour : int8_t
 {
@@ -47,7 +45,7 @@ constexpr int8_t wirePins[NUM_WIRES] = { WIRE0, WIRE1, WIRE2, WIRE3, WIRE4, WIRE
 constexpr const int16_t* readValues[NUM_WIRES] = { readValues_internal, readValues_internal, readValues_internal, readValues_internal, readValues_external, readValues_external };
 
 BicolourLED led(LED_RED, LED_GREEN);
-WireColour lastWires[6];
+WireColour lastWires[NUM_WIRES];
 int8_t solution;
 
 void setup()
@@ -66,8 +64,9 @@ void setup()
 
 void loop()
 {
-  WireColour currentWires[6];
+  WireColour currentWires[NUM_WIRES];
   readWires(currentWires);
+  
   int8_t cutIndex = getCutIndex(lastWires, currentWires);
   if (cutIndex != -1)
   {
@@ -92,12 +91,14 @@ void readWires(WireColour* outWires)
     int16_t wire = analogRead(wirePins[i]);
     outWires[i] = WireColour::None;
 
+    int16_t minDist = abs(wire - 1023); 
     for (int j = 0; j < static_cast<int>(WireColour::MAX); ++j)
     {
-      if (abs(wire - readValues[i][j]) < READ_VARIANCE)
+      int16_t dist = abs(wire - readValues[i][j]);
+      if(dist < minDist)
       {
         outWires[i] = static_cast<WireColour>(j);
-        break;
+        minDist = dist;
       }
     }
   }
