@@ -1,7 +1,9 @@
 #include "BicolourLED.h"
 #include <Arduino.h>
 
-BicolourLED::BicolourLED(int8_t redPin, int8_t greenPin) : red(redPin), green(greenPin) 
+BicolourLED::BicolourLED(int8_t redPin, int8_t greenPin) 
+    : red(redPin)
+    , green(greenPin) 
 { 
     
 }

@@ -2,6 +2,7 @@
 // By Matthew Burton
 
 #include <BicolourLED.h>
+#include <KtaneI2C.h>
 
 #define NUM_WIRES 6
 #define WIRE0 A0
@@ -44,9 +45,13 @@ constexpr int16_t readValues_external[static_cast<size_t>(WireColour::MAX)] = { 
 constexpr int8_t wirePins[NUM_WIRES] = { WIRE0, WIRE1, WIRE2, WIRE3, WIRE4, WIRE5 };
 constexpr const int16_t* readValues[NUM_WIRES] = { readValues_internal, readValues_internal, readValues_internal, readValues_internal, readValues_external, readValues_external };
 
+constexpr int8_t setupResponse = static_cast<int8_t>(RequestSetupInfo::RequestSerial);
+
 BicolourLED led(LED_RED, LED_GREEN);
 WireColour lastWires[NUM_WIRES];
 int8_t solution;
+
+KtaneI2CSlave I2C;
 
 void setup()
 {
@@ -60,6 +65,9 @@ void setup()
   // Disable the builtin LED
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
+
+  I2C.setSetupResponse(setupResponse);
+  I2C.begin(15);
 }
 
 void loop()
