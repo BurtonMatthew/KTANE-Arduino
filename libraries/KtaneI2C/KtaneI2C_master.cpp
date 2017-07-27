@@ -14,7 +14,7 @@ void KtaneI2CMaster::begin()
     Wire.begin();
 
     // Scan for connected modules
-    for(int8_t addr = 1; addr < 127; ++addr)
+    for(int8_t addr=1; addr<127; ++addr)
     {
         Wire.beginTransmission(addr);
         if(Wire.endTransmission() == 0)
@@ -23,4 +23,35 @@ void KtaneI2CMaster::begin()
             ++numModules;
         }
     }
+
+    for(int8_t i=0; i<numModules; ++i)
+    {
+        RequestSetupResponse response;
+        if(requestData(reinterpret_cast<char*>(&response), sizeof(response), modules[i].address) == WireResult::Ok)
+        {
+            Wire.beginTransmission(modules[i].address);
+            if(response.requestSetupInfo & static_cast<int8_t>(RequestSetupInfo::RequestSerial))
+            {
+                SerialNumber serial = {{'A','B','C','D','E','0'}};
+                Wire.write(static_cast<int8_t>(MessageType::SendSerial));
+                Wire.write(reinterpret_cast<char*>(&serial), sizeof(serial));
+            }
+            Wire.endTransmission();
+        }
+    }
+}
+
+WireResult KtaneI2CMaster::requestData(char* outResult, int8_t size, int8_t address)
+{
+    int8_t bytesRead = 0;
+    if(Wire.requestFrom(address, sizeof(RequestSetupResponse)) == size)
+    {
+        while(Wire.available())
+        {
+            outResult[bytesRead] = Wire.read();
+            ++bytesRead;
+        }
+    }
+
+    return bytesRead == size ? WireResult::Ok : WireResult::Fail;
 }

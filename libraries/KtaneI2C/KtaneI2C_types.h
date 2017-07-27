@@ -1,6 +1,12 @@
 #ifndef KTANEI2C_TYPES_H
 #define KTANEI2C_TYPES_H
 
+enum class WireResult : int8_t
+{
+    Ok,
+    Fail
+};
+
 enum class RequestSetupInfo : int8_t
 {
     Needy = (1 << 0),
@@ -40,10 +46,15 @@ struct RequestSetupResponse
     int8_t requestSetupInfo;
 };
 
-struct BombInfo
+enum class MessageType : int8_t
 {
-    static constexpr int8_t SerialDigits = 6;
-    char Serial[SerialDigits];
+    SendSerial,
+};
+
+struct SerialNumber
+{
+    static constexpr int8_t Digits = 6;
+    char serial[Digits];
 };
 
 #endif

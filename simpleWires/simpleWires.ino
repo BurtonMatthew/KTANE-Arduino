@@ -4,6 +4,8 @@
 #include <BicolourLED.h>
 #include <KtaneI2C.h>
 
+#define I2C_ADDRESS 15
+
 #define NUM_WIRES 6
 #define WIRE0 A0
 #define WIRE1 A1
@@ -67,7 +69,7 @@ void setup()
   digitalWrite(LED_BUILTIN, LOW);
 
   I2C.setSetupResponse(setupResponse);
-  I2C.begin(15);
+  I2C.begin(I2C_ADDRESS);
 }
 
 void loop()

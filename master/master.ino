@@ -2,7 +2,7 @@
 
 KtaneI2CMaster I2C;
 
-char serial[BombInfo::SerialDigits];
+char serial[SerialNumber::Digits];
 void setup() 
 {
   Serial.begin(9600);
