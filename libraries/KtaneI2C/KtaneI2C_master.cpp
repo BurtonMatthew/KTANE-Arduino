@@ -4,6 +4,7 @@
 
 KtaneI2CMaster::KtaneI2CMaster() 
     : numModules(0)
+    , receiveEventCallback(nullptr)
 {
 
 }
@@ -32,11 +33,24 @@ void KtaneI2CMaster::begin()
             Wire.beginTransmission(modules[i].address);
             if(response.requestSetupInfo & static_cast<int8_t>(RequestSetupInfo::RequestSerial))
             {
-                SerialNumber serial = {{'A','B','C','D','E','0'}};
+                SerialNumber serial = {{'A','B','C','D','E','1'}};
                 Wire.write(static_cast<int8_t>(MessageType::SendSerial));
                 Wire.write(reinterpret_cast<char*>(&serial), sizeof(serial));
             }
             Wire.endTransmission();
+        }
+    }
+}
+
+void KtaneI2CMaster::checkHeartbeat()
+{
+    ModuleEvent event;
+    for(int8_t i=0; i<numModules; ++i)
+    {
+        while(requestData(reinterpret_cast<char*>(&event), sizeof(event), modules[i].address) == WireResult::Ok 
+                && event != ModuleEvent::None)
+        {
+            receiveEventCallback(event, i);
         }
     }
 }

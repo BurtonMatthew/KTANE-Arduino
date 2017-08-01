@@ -54,26 +54,49 @@ WireColour lastWires[NUM_WIRES];
 int8_t solution;
 
 KtaneI2CSlave I2C;
+bool initialized;
 
 void setup()
 {
+  initialized = false;
+  
   for (int8_t i = 0; i < NUM_WIRES; ++i)
     pinMode(wirePins[i], INPUT_PULLUP);
 
   led.begin();
-  readWires(lastWires);
-  solution = findSolution(lastWires, false);
 
   // Disable the builtin LED
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
   I2C.setSetupResponse(setupResponse);
+  I2C.onReceiveMessage(onReceiveMessage);
   I2C.begin(I2C_ADDRESS);
+}
+
+void onReceiveMessage(MessageType message, char* data)
+{
+  switch(message)
+  {
+    case MessageType::SendSerial:
+      initModule(reinterpret_cast<SerialNumber*>(data));
+    break;
+  }
+}
+
+void initModule(const SerialNumber* serial)
+{
+    bool serialOdd = serial->serial[SerialNumber::Digits -1] % 2 == 1;
+    readWires(lastWires);
+    solution = findSolution(lastWires, serialOdd);
+    initialized = true;
 }
 
 void loop()
 {
+  if(!initialized)
+    return;
+    
   WireColour currentWires[NUM_WIRES];
   readWires(currentWires);
   
@@ -82,15 +105,18 @@ void loop()
   {
     if (cutIndex == solution)
     {
+      I2C.writeQueue(ModuleEvent::Complete);
       led.write(BicolourLED::Colour::Green);
     }
     else
     {
+      I2C.writeQueue(ModuleEvent::Strike);
       led.write(BicolourLED::Colour::Red);
       delay(225);
       led.write(BicolourLED::Colour::Off);
     }
     memcpy(lastWires, currentWires, sizeof(lastWires[0]) * NUM_WIRES);
+    delay(100);
   }
 }
 

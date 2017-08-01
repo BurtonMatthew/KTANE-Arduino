@@ -7,14 +7,23 @@ void setup()
 {
   Serial.begin(9600);
   delay(1000); // Give everything else time to boot
+  I2C.onEvent(onEvent);
   I2C.begin();
   Serial.print(I2C.getNumModules());
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
+  I2C.checkHeartbeat();
+  delay(10000);
+}
 
+void onEvent(ModuleEvent event, int8_t moduleIndex)
+{
+  if(event == ModuleEvent::Strike)
+    Serial.print("strike\n");
+  else if(event == ModuleEvent::Complete)
+    Serial.print("complete\n");
 }
 
 void generateSerial(char* outSerial)

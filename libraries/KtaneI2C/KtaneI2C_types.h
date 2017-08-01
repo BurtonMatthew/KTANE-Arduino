@@ -48,13 +48,25 @@ struct RequestSetupResponse
 
 enum class MessageType : int8_t
 {
-    SendSerial,
+    SendSerial
 };
 
 struct SerialNumber
 {
     static constexpr int8_t Digits = 6;
     char serial[Digits];
+};
+
+constexpr int8_t MessageSizes[] =
+{
+    [MessageType::SendSerial] = sizeof(SerialNumber)
+};
+
+enum class ModuleEvent : int8_t
+{
+    None,
+    Complete,
+    Strike
 };
 
 #endif
