@@ -1,7 +1,10 @@
+#include <TM1637Display.h>
 #include <BicolourLED.h>
 
 /** TYPES **/
 #define MORSE_LED 5
+#define DISPLAY_CLK 6
+#define DISPLAY_DIO 7
 #define BUTTON_INPUT 8
 #define LED_RED 11
 #define LED_GREEN 12
@@ -61,10 +64,10 @@ constexpr const char* words[] = { "SHELL", "HALLS", "SLICK", "TRICK",
                                   "FLICK", "BOMBS", "BREAK", "BRICK",
                                   "STEAK", "STING", "VECTOR", "BEATS" };
 
-constexpr float freqs[] = { 3.505f, 3.515f, 3.522f, 3.532f,
-                            3.535f, 3.542f, 3.545f, 3.552f,
-                            3.555f, 3.565f, 3.572f, 3.575f,
-                            3.582f, 3.592f, 3.595f, 3.600f };
+constexpr int16_t freqs[] = { 3505, 3515, 3522, 3532,
+                              3535, 3542, 3545, 3552,
+                              3555, 3565, 3572, 3575,
+                              3582, 3592, 3595, 3600 };
 
 constexpr size_t wordCount = size(words);
 
@@ -83,6 +86,7 @@ constexpr uint32_t failLedDisplayDuration = 600;
 
 /** RUNTIME VARS **/
 BicolourLED resultLed(LED_RED, LED_GREEN);
+TM1637Display display(DISPLAY_CLK, DISPLAY_DIO);
 uint32_t nextSymbolTime;
 uint32_t nextDisplayTime;
 uint32_t failLedOffTime;
@@ -102,6 +106,7 @@ void setup()
   randomSeed(analogRead(0));
   Serial.begin(9600);
   resultLed.begin();
+  display.setBrightness(0x0a);
   initModule();
 }
 
@@ -160,10 +165,11 @@ void updateDisplay()
   int8_t index = clamp(static_cast<int8_t>(rawValue / bucketSize), 0, wordCount-1);
   float remainder = fmod(rawValue, bucketSize);
 
-  if(index != lastDisplayIndex && remainder > bucketSize * 0.05f && remainder < bucketSize * 0.95f &&  millis() > nextDisplayTime)
+  if(index != lastDisplayIndex && remainder > bucketSize * 0.08f && remainder < bucketSize * 0.92f &&  millis() > nextDisplayTime)
   {
     lastDisplayIndex = index;
     nextDisplayTime = millis() + displayThrottle;
+    display.showNumberDec(freqs[index]);
     Serial.print(index, DEC);
     Serial.write("\n");
   }
