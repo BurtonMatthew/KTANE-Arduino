@@ -160,7 +160,7 @@ void updateDisplay()
   int8_t index = clamp(static_cast<int8_t>(rawValue / bucketSize), 0, wordCount-1);
   float remainder = fmod(rawValue, bucketSize);
 
-  if(index != lastDisplayIndex && remainder > bucketSize * 0.25f && remainder < bucketSize * 0.75f &&  millis() > nextDisplayTime)
+  if(index != lastDisplayIndex && remainder > bucketSize * 0.05f && remainder < bucketSize * 0.95f &&  millis() > nextDisplayTime)
   {
     lastDisplayIndex = index;
     nextDisplayTime = millis() + displayThrottle;
