@@ -74,7 +74,7 @@ constexpr size_t wordCount = size(words);
 static_assert(size(words) == size(freqs), "There should be one frequency per word");
 
 // Morse Code Timings
-constexpr uint32_t dotDuration = 600;
+constexpr uint32_t dotDuration = 450;
 constexpr uint32_t dashDuration = 3 * dotDuration;
 constexpr uint32_t symbolSpaceDuration = dotDuration;
 constexpr uint32_t letterSpaceDuration = 3 * dotDuration;
@@ -106,7 +106,6 @@ void setup()
   randomSeed(analogRead(0));
   Serial.begin(9600);
   resultLed.begin();
-  display.setBrightness(0x0a);
   initModule();
 }
 
@@ -118,10 +117,10 @@ void initModule()
   nextSymbolTime = 0;
   nextSymbolIndex = 0;
   nextLetterIndex = 0;
-  lastDisplayIndex = -1;
   nextDisplayTime = 0;
   failLedOffTime = 0;
   morseLit = false;
+  initDisplay();
 }
 
 void loop() 
@@ -143,6 +142,7 @@ void checkSubmit()
     {
       resultLed.write(BicolourLED::Colour::Green);
       digitalWrite(MORSE_LED, LOW);
+      display.clear();
       completed = true;
     }
     else
@@ -156,6 +156,15 @@ void checkSubmit()
     resultLed.write(BicolourLED::Colour::Off);
   }
   prevButtonVal = buttonVal;
+}
+
+void initDisplay()
+{
+  int16_t rawValue = analogRead(POT_INPUT);
+  float bucketSize = 1024.f / static_cast<float>(wordCount);
+  lastDisplayIndex = clamp(static_cast<int8_t>(rawValue / bucketSize), 0, wordCount-1);
+  display.setBrightness(7, true);
+  display.showNumberDec(freqs[lastDisplayIndex]);
 }
 
 void updateDisplay()
