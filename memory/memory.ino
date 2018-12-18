@@ -45,6 +45,8 @@ void setup()
         digitalWrite(StageLEDs[i], LOW);
     }
 
+    pinMode(VictoryLED, OUTPUT);
+
     beginStage();
 }
 
