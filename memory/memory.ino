@@ -243,7 +243,7 @@ void setComplete()
 
     for(int8_t i=0; i<4; ++i)
     {
-        digitalWrite(StageLEDs[i], LOW);
+        digitalWrite(StageLEDs[i], HIGH);
     }
 
     displayLabels.clear();
