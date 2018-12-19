@@ -56,7 +56,7 @@ void KtaneI2CSlave::onReceive(int numBytes)
         --numBytes;
         int8_t messageSize = MessageSizes[static_cast<int8_t>(messageType)];
         {
-            char* messageData = alloca(messageSize);
+            char* messageData = static_cast<char*>(alloca(messageSize));
             for(int8_t i=0; i<messageSize; ++i)
             {
                 messageData[i] = Wire.read();

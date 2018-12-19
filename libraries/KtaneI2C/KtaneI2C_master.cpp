@@ -37,6 +37,10 @@ void KtaneI2CMaster::begin()
                 Wire.write(static_cast<int8_t>(MessageType::SendSerial));
                 Wire.write(reinterpret_cast<char*>(&serial), sizeof(serial));
             }
+            if(response.requestSetupInfo & static_cast<int8_t>(RequestSetupInfo::RequestTime))
+            {
+                
+            }
             Wire.endTransmission();
         }
     }

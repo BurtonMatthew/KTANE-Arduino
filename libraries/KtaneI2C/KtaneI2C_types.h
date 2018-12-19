@@ -13,7 +13,8 @@ enum class RequestSetupInfo : int8_t
     RequestSerial = (1 << 1),
     RequestIndicators = (1 << 2),
     RequestNumBatteries = (1 << 3),
-    RequestPorts = (1 << 4)
+    RequestPorts = (1 << 4),
+    RequestTime = (1 << 5)
 };
 
 enum class Indicators : int16_t
@@ -48,7 +49,9 @@ struct RequestSetupResponse
 
 enum class MessageType : int8_t
 {
-    SendSerial
+    SendSerial = 0,
+    SendTotalTime,
+    MAX
 };
 
 struct SerialNumber
@@ -57,9 +60,9 @@ struct SerialNumber
     char serial[Digits];
 };
 
-constexpr int8_t MessageSizes[] =
+constexpr int8_t MessageSizes[static_cast<int8_t>(MessageType::MAX)] =
 {
-    [MessageType::SendSerial] = sizeof(SerialNumber)
+    [static_cast<int8_t>(MessageType::SendSerial)] = sizeof(SerialNumber)
 };
 
 enum class ModuleEvent : int8_t

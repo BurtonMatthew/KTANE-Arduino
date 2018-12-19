@@ -1,3 +1,5 @@
+
+constexpr int8_t switchPin = A0;
 constexpr int8_t segmentPins[8] = {2,3,4,5,6,7,8,9};
 constexpr int8_t digitPins[4] = {10,11,12,A1};
 
@@ -12,6 +14,7 @@ constexpr bool segmentsPerDigit[10][7] = { { true,  true,  true,  true,  true,  
                                            { true,  true,  true,  true,  true,  true,  true  },
                                            { true,  true,  true,  true,  false, true,  true  },
                                          };
+
 void setup() 
 {
   for(int8_t pin : segmentPins)
@@ -19,6 +22,8 @@ void setup()
 
   for(int8_t pin : digitPins)
     pinMode(pin, OUTPUT);
+
+  pinMode(switchPin, INPUT_PULLUP);
 }
 
 void loop() 
@@ -39,6 +44,13 @@ void loop()
     for(int8_t j=0; j<7; ++j)
       digitalWrite(segmentPins[j], segmentsPerDigit[digits[i]][j] ? LOW : HIGH);
     digitalWrite(segmentPins[7], HIGH);
-    delay(1);
+    delay(2);
+    
+    for(int8_t j=0; j<7; ++j)
+      digitalWrite(segmentPins[j], HIGH);
+    digitalWrite(segmentPins[7], HIGH);
+    delayMicroseconds(10);
   }
+
+  digitalWrite(13, digitalRead(switchPin));
 }
