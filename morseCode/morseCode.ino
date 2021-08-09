@@ -1,5 +1,6 @@
 #include <TM1637Display.h>
 #include <BicolourLED.h>
+#include <Button.h>
 
 /** TYPES **/
 #define MORSE_LED 5
@@ -87,6 +88,7 @@ constexpr uint32_t failLedDisplayDuration = 600;
 /** RUNTIME VARS **/
 BicolourLED resultLed(LED_RED, LED_GREEN);
 TM1637Display display(DISPLAY_CLK, DISPLAY_DIO);
+Button button(BUTTON_INPUT);
 uint32_t nextSymbolTime;
 uint32_t nextDisplayTime;
 uint32_t failLedOffTime;
@@ -104,7 +106,6 @@ void setup()
   pinMode(POT_INPUT, INPUT);
   pinMode(BUTTON_INPUT, INPUT_PULLUP);
   randomSeed(analogRead(0));
-  Serial.begin(9600);
   resultLed.begin();
   initModule();
 }
@@ -112,8 +113,6 @@ void setup()
 void initModule()
 {
   selectedWordIndex = random(wordCount);
-  //Serial.write(words[selectedWordIndex]);
-  //Serial.write("\n");
   nextSymbolTime = 0;
   nextSymbolIndex = 0;
   nextLetterIndex = 0;
@@ -136,7 +135,7 @@ void loop()
 void checkSubmit()
 {
   int8_t buttonVal = digitalRead(BUTTON_INPUT);
-  if(buttonVal == LOW && prevButtonVal == HIGH)
+  if(button.uniquePress())
   {
     if(lastDisplayIndex == selectedWordIndex)
     {
@@ -174,13 +173,11 @@ void updateDisplay()
   int8_t index = clamp(static_cast<int8_t>(rawValue / bucketSize), 0, wordCount-1);
   float remainder = fmod(rawValue, bucketSize);
 
-  if(index != lastDisplayIndex && remainder > bucketSize * 0.08f && remainder < bucketSize * 0.92f &&  millis() > nextDisplayTime)
+  if(index != lastDisplayIndex && remainder > bucketSize * 0.18f && remainder < bucketSize * 0.82f &&  millis() > nextDisplayTime)
   {
     lastDisplayIndex = index;
     nextDisplayTime = millis() + displayThrottle;
     display.showNumberDec(freqs[index]);
-    Serial.print(index, DEC);
-    Serial.write("\n");
   }
 }
 
